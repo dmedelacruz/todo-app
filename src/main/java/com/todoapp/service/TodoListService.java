@@ -6,14 +6,12 @@ import com.todoapp.database.entity.TodoList;
 import com.todoapp.database.repository.TodoListRepository;
 import com.todoapp.exception.IllegalOperationException;
 import com.todoapp.exception.RecordNotFoundException;
-import com.todoapp.utils.UserUtil;
+import com.todoapp.utils.MapperService;
+import com.todoapp.utils.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,29 +20,31 @@ import java.util.stream.Collectors;
 public class TodoListService {
 
     private final TodoListRepository todoListRepository;
+    private final MapperService mapperService;
+    private final UserService userService;
 
     public List<TodoListResponse> getAllTodoLists(List<String> owners) {
         if(owners.isEmpty()) {
-            owners.add(UserUtil.getLoggedInUserId());
+            owners.add(userService.getLoggedInUserId());
         }
         List<TodoList> todoLists = todoListRepository.findAllByOwnerIn(owners);
-        return todoLists.stream().map(this::mapTodoListResponse).collect(Collectors.toList());
+        return todoLists.stream().map(mapperService::mapTodoListResponse).collect(Collectors.toList());
     }
 
     public TodoListResponse getTodoListById(String todoListId) {
         TodoList todoList = todoListRepository.findOneById(todoListId);
-        return mapTodoListResponse(todoList);
+        return mapperService.mapTodoListResponse(todoList);
     }
 
     @Transactional
     public TodoListResponse createTodoList(TodoListRequest todoListRequest) {
         TodoList todoList = new TodoList();
         todoList.setHeader(todoListRequest.getHeader());
-        todoList.setOwner(UserUtil.getLoggedInUserId());
+        todoList.setOwner(userService.getLoggedInUserId());
 
         TodoList persistedTodoList = todoListRepository.save(todoList);
 
-        return mapTodoListResponse(persistedTodoList);
+        return mapperService.mapTodoListResponse(persistedTodoList);
     }
 
     @Transactional
@@ -56,12 +56,12 @@ public class TodoListService {
             throw new RecordNotFoundException("Record not found");
         }
 
-        if (UserUtil.isLoggedInUser(todoList.getOwner())) {
+        if (userService.isLoggedInUser(todoList.getOwner())) {
 
             todoList.setHeader(todoListRequest.getHeader());
             TodoList updatedTodoList = todoListRepository.save(todoList);
 
-            return mapTodoListResponse(updatedTodoList);
+            return mapperService.mapTodoListResponse(updatedTodoList);
 
         } else {
             throw new IllegalOperationException("Only owner can update");
@@ -77,7 +77,7 @@ public class TodoListService {
             throw new RecordNotFoundException("Record not found");
         }
 
-        if (UserUtil.isLoggedInUser(todoList.getOwner())) {
+        if (userService.isLoggedInUser(todoList.getOwner())) {
             todoListRepository.delete(todoList);
         } else {
             throw new IllegalOperationException("Only owner can delete");
@@ -85,18 +85,4 @@ public class TodoListService {
 
     }
 
-//    @Transactional
-//    public void deleteTodoLists(List<String> todoListIds) {
-//        todoListRepository.deleteAllById(todoListIds);
-//    }
-
-    private TodoListResponse mapTodoListResponse(TodoList todoList) {
-        return new TodoListResponse(
-                todoList.getId(),
-                todoList.getHeader(),
-                todoList.getCreatedDate(),
-                todoList.getModifiedDate(),
-                todoList.getOwner()
-        );
-    }
 }

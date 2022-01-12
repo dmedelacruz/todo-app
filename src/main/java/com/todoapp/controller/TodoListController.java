@@ -5,9 +5,7 @@ import com.todoapp.dao.response.BaseResponse;
 import com.todoapp.dao.response.TodoListResponse;
 import com.todoapp.service.TodoListService;
 import lombok.RequiredArgsConstructor;
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,12 +51,5 @@ public class TodoListController {
         todoListService.deleteTodoListById(todoListId);
         return new BaseResponse<>(Map.of("success", true));
     }
-
-//    @DeleteMapping
-//    public void deleteTodoListByBatch(@RequestBody List<String> todoListIds) {
-//        todoListService.deleteTodoLists(todoListIds);
-//    }
-
-
 
 }

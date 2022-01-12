@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
-public class TodoListResponse {
+public class TodoResponse {
 
     @JsonProperty("id")
     private final String id;
 
-    @JsonProperty("header")
-    private final String header;
+    @JsonProperty("description")
+    private final String description;
 
     @JsonProperty("created_date")
     private final Date createdDate;
@@ -21,9 +20,7 @@ public class TodoListResponse {
     @JsonProperty("modified_date")
     private final Date modifiedDate;
 
-    @JsonProperty("owner")
-    private final String owner;
+    @JsonProperty("is_done")
+    private final Boolean isDone;
 
-    @JsonProperty("todos")
-    private final List<TodoResponse> todos;
 }

@@ -2,18 +2,18 @@ package com.todoapp.utils;
 
 import org.keycloak.KeycloakPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
-public final class UserUtil {
+@Service
+public final class UserService {
 
-    private UserUtil() {}
-
-    public static boolean isLoggedInUser(String userId) {
+    public boolean isLoggedInUser(String userId) {
         KeycloakPrincipal principal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String loggedInUserId = principal.getKeycloakSecurityContext().getToken().getSubject();
         return loggedInUserId.equals(userId);
     }
 
-    public static String getLoggedInUserId() {
+    public String getLoggedInUserId() {
         KeycloakPrincipal principal = (KeycloakPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return principal.getKeycloakSecurityContext().getToken().getSubject();
     }
